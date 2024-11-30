@@ -20,7 +20,7 @@ app.use('/user',userRouter)
 
 
 
-mongoose.connect('mongodb://0.0.0.0:27017/pointsapp')
+mongoose.connect(process.env.MONGOURI)
 .then(() => {
     app.listen(PORT, () => console.log(`server is running on port ${PORT}`))
     console.log('Database connected');
