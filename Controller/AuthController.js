@@ -6,7 +6,6 @@ const userdataModel = require('../Models/userDetails')
 
 exports.phoneVerification  = (req,res) => {
 
-
     const {email, phone} = req.body.data
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
@@ -23,7 +22,6 @@ exports.phoneVerification  = (req,res) => {
        }
        
        else {
-        console.log(email, true);
          givenOtp = mailotp.otp
          otpMailer(givenOtp,email)
              return res.status(200).json({ success: true, message: 'Email verified successfully' });
@@ -49,11 +47,9 @@ exports.otpverification = async (req, res) => {
 
    } else {
 
-
      try {
        // Check if the user already exists
        const User = await userdataModel.findOne({ deviceId });
-
 
        if (User) {
         
@@ -63,9 +59,7 @@ exports.otpverification = async (req, res) => {
          console.log('email and phone saved successfully');
        return res.status(200).json({ success: true, message: 'OTP verified and data successfully' });
        
-     } else {
-      console.log(false);
-      
+     } else {      
       return res.status(404).json({ success: false, message: 'user not found' });
 
      }
@@ -80,22 +74,36 @@ exports.otpverification = async (req, res) => {
 
 
  exports.checkUser =  async (req, res) => {
-  const { deviceId,  } = req.body; // Assuming deviceId is sent
+  console.log(req.body);
   
-  const user = await userdataModel.findOne({
-    deviceId: deviceId,
-    email: { $ne: '' }
-  });
-  if (user) {
-    return res.json({ isNewUser: false });
-  } else {
+  const { deviceId } = req.body; // Assuming deviceId is sent
+  
+   try {
 
-    const newSchema = new userdataModel({
-      deviceId,
-    });
-    await newSchema.save();
-    return res.json({ isNewUser: true });
-  }
+    // const user = await userdataModel.findOne({
+    //   deviceId: deviceId,
+    //   email: { $ne: '' }
+    // });
+
+    const user = await userdataModel.findOne({deviceId})
+    
+    if (user) {
+      return res.status(200).json({ isNewUser: false });
+    } else {
+  
+      const newSchema = new userdataModel({
+        deviceId,
+      });
+      await newSchema.save();
+      return res.status(200).json({ isNewUser: true });
+    }
+
+   }catch (err) {
+
+    return res.status(500).json({ success: false, message: 'Server error' });
+
+   }
+  
 };
 
 
