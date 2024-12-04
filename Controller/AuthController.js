@@ -74,34 +74,31 @@ exports.otpverification = async (req, res) => {
 
 
  exports.checkUser =  async (req, res) => {
-  console.log(req.body);
   
   const { deviceId } = req.body; // Assuming deviceId is sent
   
    try {
 
-    // const user = await userdataModel.findOne({
-    //   deviceId: deviceId,
-    //   email: { $ne: '' }
-    // });
-
     const user = await userdataModel.findOne({deviceId})
     
     if (user) {
+      console.log(1);
+      
       return res.status(200).json({ isNewUser: false });
     } else {
-  
+      console.log(2);
       const newSchema = new userdataModel({
         deviceId,
       });
       await newSchema.save();
+      console.log(3);
+      
       return res.status(200).json({ isNewUser: true });
     }
 
    }catch (err) {
-
-    return res.status(500).json({ success: false, message: 'Server error' });
-
+    console.log('userchecking failed',err);
+    
    }
   
 };
