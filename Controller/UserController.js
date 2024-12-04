@@ -89,9 +89,5 @@ exports.editProfile = async (req, res) => {
 
 
 exports.FetchUser = (req,res) => {
-  const {deviceId} = req.body
-  console.log('here');
-  
-  console.log(deviceId);
-  
+  const {deviceId} = req.body  
 }
