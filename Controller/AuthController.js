@@ -5,30 +5,37 @@ const userdataModel = require('../Models/userDetails')
 
 
 exports.phoneVerification  = (req,res) => {
+
+
     const {email, phone} = req.body.data
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
     const phoneregex = /^\+?(\d{1,3})?[-.\s]?(\(?\d{1,4}\)?)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/;
 
- if(!emailRegex.test(email)) {
-    return res.status(400).json({ success: false, message: 'Please enter a valid email'});
+      try {
+        if(!emailRegex.test(email)) {
+          return res.status(400).json({ success: false, message: 'Please enter a valid email'});
+      
+       } else if (!phoneregex.test(phone)) {
+         return res.status(400).json({ success: false, message: 'Please enter a valid phone number'});
+      
+       }
+       
+       else {
+        console.log(email, true);
+         givenOtp = mailotp.otp
+         otpMailer(givenOtp,email)
+             return res.status(200).json({ success: true, message: 'Email verified successfully' });
+      
+       }
+      }catch (err) {
+        return res.status(500).json({ success: false, message: 'Internal server error', err});
 
- } else if (!phoneregex.test(phone)) {
-   return res.status(400).json({ success: false, message: 'Please enter a valid phone number'});
 
- }
- 
- else {
-   givenOtp = mailotp.otp
-   otpMailer(givenOtp,email)
-       return res.status(200).json({ success: true, message: 'Email verified successfully' });
-
- }
+      }
     
 } 
-
-
 
 
 exports.otpverification = async (req, res) => { 
@@ -75,8 +82,10 @@ exports.otpverification = async (req, res) => {
  exports.checkUser =  async (req, res) => {
   const { deviceId,  } = req.body; // Assuming deviceId is sent
   
-  const user = await userdataModel.findOne({ deviceId });
-
+  const user = await userdataModel.findOne({
+    deviceId: deviceId,
+    email: { $ne: '' }
+  });
   if (user) {
     return res.json({ isNewUser: false });
   } else {
