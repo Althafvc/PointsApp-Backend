@@ -6,7 +6,10 @@ const userdataModel = require('../Models/userDetails')
 
 exports.phoneVerification  = (req,res) => {
 
-    const {email, phone} = req.body.data
+  console.log(req.body);
+  
+
+    const {email, phone} = req.body
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
@@ -22,7 +25,7 @@ exports.phoneVerification  = (req,res) => {
        }
        
        else {
-         givenOtp = mailotp.otp
+         givenOtp = mailotp.otp         
          otpMailer(givenOtp,email)
              return res.status(200).json({ success: true, message: 'Email verified successfully' });
       
