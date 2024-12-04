@@ -5,14 +5,7 @@ const userdataModel = require('../Models/userDetails')
 
 
 exports.phoneVerification  = (req,res) => {
-
-
-   
     const {email, phone} = req.body.data
-
-
-
-    
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
@@ -35,9 +28,13 @@ exports.phoneVerification  = (req,res) => {
     
 } 
 
+
+
+
 exports.otpverification = async (req, res) => { 
    
-   const { otpCode, email, phone } = req.body;
+   const { otpCode, email, phone, deviceId } = req.body;
+   
    const receivedOtp = otpCode.join('');   
 
    if (givenOtp != receivedOtp) {      
@@ -48,29 +45,50 @@ exports.otpverification = async (req, res) => {
 
      try {
        // Check if the user already exists
-       const oldUser = await userdataModel.findOne({ email });
- 
-       if (oldUser) {
-         return res.status(400).json({ success: false, message: 'User already exists' });
-       } else {
-         // Create a new user
-         const newSchema = new userdataModel({
-           email: email,
-           phone,phone
-         });
- 
-         await newSchema.save();
-         console.log('User saved successfully');
-       }
-       return res.status(200).json({ success: true, message: 'OTP verified successfully' });
+       const User = await userdataModel.findOne({ deviceId });
+
+
+       if (User) {
+        
+       User.email = email,
+       User.phone= phone
+       await User.save();
+         console.log('email and phone saved successfully');
+       return res.status(200).json({ success: true, message: 'OTP verified and data successfully' });
        
-     } catch (err) {
+     } else {
+      console.log(false);
+      
+      return res.status(404).json({ success: false, message: 'user not found' });
+
+     }
+
+    }catch (err) {
        console.error('Error saving user:', err);
        return res.status(500).json({ success: false, message: 'Server error' });
      }
 
    }
  };
+
+
+ exports.checkUser =  async (req, res) => {
+  const { deviceId,  } = req.body; // Assuming deviceId is sent
+  
+  const user = await userdataModel.findOne({ deviceId });
+
+  if (user) {
+    return res.json({ isNewUser: false });
+  } else {
+
+    const newSchema = new userdataModel({
+      deviceId,
+    });
+    await newSchema.save();
+    return res.json({ isNewUser: true });
+  }
+};
+
 
 
 

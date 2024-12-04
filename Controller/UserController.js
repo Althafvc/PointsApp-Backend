@@ -4,18 +4,22 @@ const moment = require("moment"); // Add this line at the top of your file if us
 
 
 exports.fetchingData =async (req, res) => {
-  const {email} = req.body
+  const {email, deviceId} = req.body
+
+  console.log(req.body);
+  
 
   try {
     const user = await userdataModel.findOne({email})
+    const iduser = await userdataModel.findOne({deviceId})
 
-    if(!user) {
+    if(!user && !iduser) {
       console.log('invalid user request');
       return res.status(404).json({ success: false, message: "User not found" });
-
       
     }else {
-      return res.status(200).json({ success: true, message: "user found",user:user });
+      
+      return res.status(200).json({ success: true, message: "user found",user:user, iduser:iduser });
 
     }
 
@@ -24,15 +28,7 @@ exports.fetchingData =async (req, res) => {
   }catch(err) {
     console.log('userdata fetching failed');
     return res.status(500).json({ success: false, message: "Server error" });
-
-    
   }
-
-
-  
-  
-  
-  res.status(200).json({ message: 'User data fetched successfully!' });
 };
 
 
@@ -41,10 +37,9 @@ exports.fetchingData =async (req, res) => {
 
 
 exports.editProfile = async (req, res) => {
-  const { name, DOB, phone, gender, nationality, city, pincode,email } = req.body;
-
-console.log(email);
-
+  console.log(req.body);
+  
+  const { name, DOB, phone, gender, nationality, city, pincode,email, deviceId } = req.body;
 
   if (
     name.trim() === "" ||
@@ -64,10 +59,11 @@ console.log(email);
     return res.status(400).json({ success: false, message: "Invalid pincode entered" });
   } else {
     try {
-      const user = await userdataModel.findOne({ email });
+      const user = await userdataModel.findOne({ $or: [{ email }, { deviceId }] });
 
       if (!user) {
         return res.status(404).json({ success: false, message: "User not found" });
+
       } else {
         // Convert DOB from string to Date object (using moment.js)
         const formattedDOB = moment(DOB, "DD/MM/YYYY").toDate(); // This converts the string to a Date object
@@ -90,3 +86,12 @@ console.log(email);
     }
   }
 };
+
+
+exports.FetchUser = (req,res) => {
+  const {deviceId} = req.body
+  console.log('here');
+  
+  console.log(deviceId);
+  
+}

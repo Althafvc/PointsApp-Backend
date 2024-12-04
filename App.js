@@ -19,10 +19,10 @@ app.use('/user',userRouter)
 
 
 
-
-mongoose.connect(process.env.MONGOURI)
-.then(() => {
-    app.listen(PORT, () => console.log(`server is running on port ${PORT}`))
+mongoose.connect(process.env.MONGOURI || 'mongodb://0.0.0.0:27017/pointsapp')
+  .then(() => {
+    app.listen(PORT, () => console.log(`server is running on port ${PORT}`));
     console.log('Database connected');
-}).catch((error) => console.log('connection error', error));
+  })
+  .catch((error) => console.log('connection error', error));
 
